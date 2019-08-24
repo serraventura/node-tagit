@@ -170,7 +170,7 @@ module.exports = class NodeTAGit {
       const MINOR = parseInt(versionTag[1] || 0) + 1;
       const PATCH = 0;
 
-      return `${MAJOR}.${MINOR}.${PATCH}`;
+      return `${MAJOR}.${MINOR}.${PATCH}`.replace(this.tagVersionNaming, 'release_');
     }
   }
 
