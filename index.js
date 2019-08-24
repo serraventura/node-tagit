@@ -4,7 +4,7 @@ const fs = require("fs");
 const PROD_BRANCH = "master";
 const REGEX_FEATURE_TICKETS = /(F-[0-9]*|FEATURE-[0-9]*|FR-[0-9]*)/g;
 const REGEX_DEFECT_TICKETS = /(D-[0-9]*|DEFECT-[0-9]*|BUG-[0-9]*|BUGFIX-[0-9]*)/g;
-const TAG_VERSION_NAMING = "release_v";
+const TAG_VERSION_NAMING = "v";
 const VERSION_FOLDER_PATH = "./version_logs";
 
 module.exports = class NodeTAGit {
