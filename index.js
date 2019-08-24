@@ -45,9 +45,7 @@ module.exports = class NodeTAGit {
   }
 
   getLatestVersionTag() {
-    const command = `git describe --tags ${
-      this.prodBranchName
-    } --abbrev=0 --match "${this.tagVersionNaming}*"`;
+    const command = `git describe --tags ${this.prodBranchName} --abbrev=0 --match "${this.tagVersionNaming}*"`;
 
     let result = null;
 
@@ -105,9 +103,7 @@ module.exports = class NodeTAGit {
     const extraMin = new Date(tagDate).setMinutes(mins);
     const isoTagDate = new Date(extraMin).toISOString();
 
-    const command = `git --no-pager log --since="${isoTagDate}" --no-merges --oneline --pretty=format:"%h%m%an%m%ad%m%s" --date=iso8601 ${
-      this.prodBranchName
-    }`;
+    const command = `git --no-pager log --since="${isoTagDate}" --no-merges --oneline --pretty=format:"%h%m%an%m%ad%m%s" --date=iso8601 ${this.prodBranchName}`;
 
     console.log(command);
 
@@ -125,13 +121,19 @@ module.exports = class NodeTAGit {
   pushNewTagVersion(newTag) {
     // const command = 'git tag ' + newTag + ' ' + this.prodBranchName + ';git push --follow-tags';
     const command = `git tag ${newTag} ${this.prodBranchName}`;
+    const command2 = `git tag ${this.getNewReleaseTagVersion()} ${
+      this.prodBranchName
+    }`;
 
     console.log(command);
+    console.log(command2);
 
     const result = childProcess
       .execSync(command)
       .toString()
       .trim();
+
+    childProcess.execSync(command2);
 
     console.log("result: ", result, " new version tag pushed");
   }
@@ -147,43 +149,40 @@ module.exports = class NodeTAGit {
     return result;
   }
 
-  getNewTagVersion() {
-    const isThereLog = this.log !== "";
-    let isFeatureTicketPresent = false;
-    let isDefectTicketPresent = false;
-    let commitMessage;
+  findTicket(regex) {
+    let isTicketPresent = false;
 
-    if (isThereLog) {
+    if (!!this.log) {
       const logByLine = this.log.split("\n");
 
       logByLine.forEach(item => {
-        commitMessage = item.split(">")[3] || "";
-
-        if (commitMessage.match(this.regexFeatureTickets)) {
-          isFeatureTicketPresent = true;
-        }
-
-        if (commitMessage.match(this.regexDefectTickets)) {
-          isDefectTicketPresent = true;
-        }
+        if ((item.split(">")[3] || "").match(regex)) isTicketPresent = true;
       });
     }
 
-    if (isThereLog) {
+    return isTicketPresent;
+  }
+
+  getNewReleaseTagVersion() {
+    if (!!this.log) {
+      const versionTag = this.lastTagVersion.split(".");
+      const MAJOR = versionTag[0];
+      const MINOR = parseInt(versionTag[1] || 0) + 1;
+      const PATCH = 0;
+
+      return `${MAJOR}.${MINOR}.${PATCH}`;
+    }
+  }
+
+  getNewTagVersion() {
+    let isFeatureTicketPresent = this.findTicket(this.regexFeatureTickets);
+    let isDefectTicketPresent = this.findTicket(this.regexDefectTickets);
+
+    if (!!this.log) {
       let versionTag = this.lastTagVersion.split(".");
-      let MAJOR = versionTag[0];
-      let MINOR = parseInt(versionTag[1] || 0) + 1;
-      let PATCH = versionTag[2] || 0;
-
-      // it should check only isFeatureTicketPresent but for now
-      // in case the ticket number was not present on feature branch and there's log we'll increase version anyway
-      versionTag =
-        isThereLog || isFeatureTicketPresent
-          ? `${MAJOR}.${MINOR}.${PATCH}`.split(".")
-          : versionTag;
-
-      // should be uncommented out when the branch strategy is working properly
-      // versionTag = isFeatureTicketPresent ? (versionTag[0] + '.' + (parseInt(versionTag[1] || 0) + 1) + '.' + (versionTag[2] || 0) ).split('.') : versionTag;
+      let MAJOR;
+      let MINOR;
+      let PATCH;
 
       if (isDefectTicketPresent && !isFeatureTicketPresent) {
         MAJOR = versionTag[0];
@@ -191,10 +190,15 @@ module.exports = class NodeTAGit {
         PATCH = parseInt(versionTag[2] || 0) + 1;
 
         versionTag = `${MAJOR}.${MINOR}.${PATCH}`.split(".");
-      } else if (isDefectTicketPresent && isFeatureTicketPresent) {
+      }
+
+      if (
+        (isDefectTicketPresent && isFeatureTicketPresent) ||
+        (!isDefectTicketPresent && isFeatureTicketPresent)
+      ) {
         MAJOR = versionTag[0];
-        MINOR = versionTag[1] || 0;
-        PATCH = "1";
+        MINOR = parseInt(versionTag[1] || 0) + 1;
+        PATCH = "0";
 
         versionTag = `${MAJOR}.${MINOR}.${PATCH}`.split(".");
       }
