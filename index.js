@@ -5,12 +5,14 @@ const PROD_BRANCH = "master";
 const REGEX_FEATURE_TICKETS = /(F-[0-9]*|FEATURE-[0-9]*|FR-[0-9]*)/g;
 const REGEX_DEFECT_TICKETS = /(D-[0-9]*|DEFECT-[0-9]*|BUG-[0-9]*|BUGFIX-[0-9]*)/g;
 const TAG_VERSION_NAMING = "v";
+const INITIAL_TAG_VERSION = "0.1.0";
 const VERSION_FOLDER_PATH = "./version_logs";
 
 module.exports = class NodeTAGit {
   saveHTMLLogs;
   prodBranchName;
   tagVersionNaming;
+  initialTagVersion;
   regexFeatureTickets;
   regexDefectTickets;
   versionFolderPath;
@@ -20,6 +22,7 @@ module.exports = class NodeTAGit {
   constructor(
     prodBranchName = PROD_BRANCH,
     tagVersionNaming = TAG_VERSION_NAMING,
+    initialTagVersion = INITIAL_TAG_VERSION,
     regexFeatureTickets = REGEX_FEATURE_TICKETS,
     regexDefectTickets = REGEX_DEFECT_TICKETS,
     saveHTMLLogs,
@@ -27,6 +30,7 @@ module.exports = class NodeTAGit {
   ) {
     this.prodBranchName = prodBranchName;
     this.tagVersionNaming = tagVersionNaming;
+    this.initialTagVersion = initialTagVersion;
     this.regexFeatureTickets = regexFeatureTickets;
     this.regexDefectTickets = regexDefectTickets;
     this.saveHTMLLogs = saveHTMLLogs;
@@ -120,20 +124,25 @@ module.exports = class NodeTAGit {
 
   pushNewTagVersion(newTag) {
     // const command = 'git tag ' + newTag + ' ' + this.prodBranchName + ';git push --follow-tags';
+    const releaseTag = this.getNewReleaseTagVersion();
     const command = `git tag ${newTag} ${this.prodBranchName}`;
-    const command2 = `git tag ${this.getNewReleaseTagVersion()} ${
-      this.prodBranchName
-    }`;
 
     console.log(command);
-    console.log(command2);
 
     const result = childProcess
       .execSync(command)
       .toString()
       .trim();
 
-    childProcess.execSync(command2);
+    if (!!releaseTag) {
+      const command2 = `git tag ${releaseTag} ${
+        this.prodBranchName
+      }`;
+
+      console.log(command2);
+
+      childProcess.execSync(command2);
+    }
 
     console.log("result: ", result, " new version tag pushed");
   }
@@ -164,13 +173,16 @@ module.exports = class NodeTAGit {
   }
 
   getNewReleaseTagVersion() {
-    if (!!this.log) {
+    if (!this.log) return;
+
+    if (!!this.lastTagVersion) {
       const versionTag = this.lastTagVersion.split(".");
       const MAJOR = versionTag[0];
       const MINOR = parseInt(versionTag[1] || 0) + 1;
-      const PATCH = 0;
 
-      return `${MAJOR}.${MINOR}.${PATCH}`.replace(this.tagVersionNaming, 'release_');
+      return `${MAJOR}.${MINOR}`.replace(this.tagVersionNaming, "release_");
+    } else {
+      return `release_${this.initialTagVersion}`;
     }
   }
 
@@ -287,7 +299,9 @@ module.exports = class NodeTAGit {
             console.warn("No changes on release. Tag version not applied.");
           }
         } else {
-          this.pushNewTagVersion(`${this.tagVersionNaming}1.0.0`);
+          this.pushNewTagVersion(
+            `${this.tagVersionNaming}${this.initialTagVersion}`
+          );
         }
       } else {
         console.warn(
