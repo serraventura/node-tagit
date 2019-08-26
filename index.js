@@ -169,6 +169,8 @@ module.exports = class NodeTAGit {
       const MAJOR = versionTag[0];
       const MINOR = parseInt(versionTag[1] || 0) + 1;
 
+      console.log('MAJOR: ', MAJOR, 'MINOR: ', MINOR)
+
       return `${MAJOR}.${MINOR}`.replace(this.tagVersionNaming, "release_");
     } else if (!this.log || !this.lastTagVersion) {
       return `release_${this.initialTagVersion}`;
