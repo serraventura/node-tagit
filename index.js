@@ -124,10 +124,7 @@ module.exports = class NodeTAGit {
 
   pushNewTagVersion(newTag) {
     // const command = 'git tag ' + newTag + ' ' + this.prodBranchName + ';git push --follow-tags';
-    // const releaseTag = this.getNewReleaseTagVersion();
     const command = `git tag ${newTag} ${this.prodBranchName}`;
-
-    // console.log("releaseTagreleaseTag: ", releaseTag);
 
     console.log(command);
 
@@ -135,14 +132,6 @@ module.exports = class NodeTAGit {
       .execSync(command)
       .toString()
       .trim();
-
-    // if (!!releaseTag) {
-    //   const command2 = `git tag ${releaseTag} ${this.prodBranchName}`;
-
-    //   console.log(command2);
-
-    //   childProcess.execSync(command2);
-    // }
 
     console.log("result: ", result, " new version tag pushed");
   }
