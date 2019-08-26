@@ -124,8 +124,10 @@ module.exports = class NodeTAGit {
 
   pushNewTagVersion(newTag) {
     // const command = 'git tag ' + newTag + ' ' + this.prodBranchName + ';git push --follow-tags';
-    const releaseTag = this.getNewReleaseTagVersion();
+    // const releaseTag = this.getNewReleaseTagVersion();
     const command = `git tag ${newTag} ${this.prodBranchName}`;
+
+    // console.log("releaseTagreleaseTag: ", releaseTag);
 
     console.log(command);
 
@@ -134,15 +136,13 @@ module.exports = class NodeTAGit {
       .toString()
       .trim();
 
-    if (!!releaseTag) {
-      const command2 = `git tag ${releaseTag} ${
-        this.prodBranchName
-      }`;
+    // if (!!releaseTag) {
+    //   const command2 = `git tag ${releaseTag} ${this.prodBranchName}`;
 
-      console.log(command2);
+    //   console.log(command2);
 
-      childProcess.execSync(command2);
-    }
+    //   childProcess.execSync(command2);
+    // }
 
     console.log("result: ", result, " new version tag pushed");
   }
@@ -173,7 +173,7 @@ module.exports = class NodeTAGit {
   }
 
   getNewReleaseTagVersion() {
-    if (!this.log) return;
+    console.log("this.log: ", this.log);
 
     if (!!this.lastTagVersion) {
       const versionTag = this.lastTagVersion.split(".");
@@ -181,7 +181,7 @@ module.exports = class NodeTAGit {
       const MINOR = parseInt(versionTag[1] || 0) + 1;
 
       return `${MAJOR}.${MINOR}`.replace(this.tagVersionNaming, "release_");
-    } else {
+    } else if (!this.log || !this.lastTagVersion) {
       return `release_${this.initialTagVersion}`;
     }
   }
@@ -290,6 +290,7 @@ module.exports = class NodeTAGit {
               console.log("newTagVersion: ", newTagVersion);
               if (this.saveHTMLLogs) this.generateHTMLVersionLog();
               this.pushNewTagVersion(newTagVersion);
+              this.pushNewTagVersion(this.getNewReleaseTagVersion());
             } else {
               console.warn(
                 "No log changes/features detected. Tag version not applied."
@@ -302,6 +303,7 @@ module.exports = class NodeTAGit {
           this.pushNewTagVersion(
             `${this.tagVersionNaming}${this.initialTagVersion}`
           );
+          this.pushNewTagVersion(`release_${this.initialTagVersion}`);
         }
       } else {
         console.warn(
