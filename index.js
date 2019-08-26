@@ -48,8 +48,10 @@ module.exports = class NodeTAGit {
     return result;
   }
 
-  getLatestVersionTag() {
-    const command = `git describe --tags ${this.prodBranchName} --abbrev=0 --match "${this.tagVersionNaming}*"`;
+  getLatestVersionTag(tagName) {
+    const command = `git describe --tags ${
+      this.prodBranchName
+    } --abbrev=0 --match "${tagName || this.tagVersionNaming}*"`;
 
     let result = null;
 
@@ -164,15 +166,24 @@ module.exports = class NodeTAGit {
   getNewReleaseTagVersion() {
     console.log("this.log: ", this.log);
 
-    if (!!this.lastTagVersion) {
-      const versionTag = this.lastTagVersion.split(".");
+    const lastTagVersion = this.getLatestVersionTag("release_");
+
+    if (!!lastTagVersion) {
+      const versionTag = lastTagVersion.split(".");
       const MAJOR = versionTag[0];
       const MINOR = parseInt(versionTag[1] || 0) + 1;
 
-      console.log('this.lastTagVersion: ', this.lastTagVersion, 'MAJOR: ', MAJOR, 'MINOR: ', MINOR)
+      console.log(
+        "lastTagVersion: ",
+        lastTagVersion,
+        "MAJOR: ",
+        MAJOR,
+        "MINOR: ",
+        MINOR
+      );
 
-      return `${MAJOR}.${MINOR}`.replace(this.tagVersionNaming, "release_");
-    } else if (!this.log || !this.lastTagVersion) {
+      return `${MAJOR}.${MINOR}`;
+    } else if (!this.log || !lastTagVersion) {
       return `release_${this.initialTagVersion}`;
     }
   }
