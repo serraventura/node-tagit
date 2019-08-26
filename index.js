@@ -10,7 +10,7 @@ const VERSION_FOLDER_PATH = "./version_logs";
 
 module.exports = class NodeTAGit {
   saveHTMLLogs;
-  prodBranchName;
+  targetBranchName;
   tagVersionNaming;
   initialTagVersion;
   regexFeatureTickets;
@@ -20,7 +20,7 @@ module.exports = class NodeTAGit {
   newVersionTag;
 
   constructor(
-    prodBranchName = PROD_BRANCH,
+    targetBranchName = PROD_BRANCH,
     tagVersionNaming = TAG_VERSION_NAMING,
     initialTagVersion = INITIAL_TAG_VERSION,
     regexFeatureTickets = REGEX_FEATURE_TICKETS,
@@ -28,7 +28,7 @@ module.exports = class NodeTAGit {
     saveHTMLLogs,
     versionFolderPath = VERSION_FOLDER_PATH
   ) {
-    this.prodBranchName = prodBranchName;
+    this.targetBranchName = targetBranchName;
     this.tagVersionNaming = tagVersionNaming;
     this.initialTagVersion = initialTagVersion;
     this.regexFeatureTickets = regexFeatureTickets;
@@ -50,7 +50,7 @@ module.exports = class NodeTAGit {
 
   getLatestVersionTag(tagName) {
     const command = `git describe --tags ${
-      this.prodBranchName
+      this.targetBranchName
     } --abbrev=0 --match "${tagName || this.tagVersionNaming}*"`;
 
     let result = null;
@@ -109,7 +109,7 @@ module.exports = class NodeTAGit {
     const extraMin = new Date(tagDate).setMinutes(mins);
     const isoTagDate = new Date(extraMin).toISOString();
 
-    const command = `git --no-pager log --since="${isoTagDate}" --no-merges --oneline --pretty=format:"%h%m%an%m%ad%m%s" --date=iso8601 ${this.prodBranchName}`;
+    const command = `git --no-pager log --since="${isoTagDate}" --no-merges --oneline --pretty=format:"%h%m%an%m%ad%m%s" --date=iso8601 ${this.targetBranchName}`;
 
     console.log(command);
 
@@ -125,8 +125,8 @@ module.exports = class NodeTAGit {
   }
 
   pushNewTagVersion(newTag) {
-    // const command = 'git tag ' + newTag + ' ' + this.prodBranchName + ';git push --follow-tags';
-    const command = `git tag ${newTag} ${this.prodBranchName}`;
+    // const command = 'git tag ' + newTag + ' ' + this.targetBranchName + ';git push --follow-tags';
+    const command = `git tag ${newTag} ${this.targetBranchName}`;
 
     console.log(command);
 
@@ -268,7 +268,7 @@ module.exports = class NodeTAGit {
 
   run() {
     try {
-      if (this.getCurrentBranch() === this.prodBranchName) {
+      if (this.getCurrentBranch() === this.targetBranchName) {
         const lastTagVersion = this.getLatestVersionTag();
 
         if (lastTagVersion) {
