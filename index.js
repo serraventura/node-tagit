@@ -2,8 +2,8 @@ const childProcess = require("child_process");
 const fs = require("fs");
 
 const PROD_BRANCH = "master";
-const REGEX_FEATURE_TICKETS = /(F-[0-9]*|FEATURE-[0-9]*|FR-[0-9]*)/g;
-const REGEX_DEFECT_TICKETS = /(D-[0-9]*|DEFECT-[0-9]*|BUG-[0-9]*|BUGFIX-[0-9]*)/g;
+const REGEX_FEATURE_TICKETS = /(enhancement-[0-9]*|feature-[0-9]*|feat-[0-9]*)/g;
+const REGEX_DEFECT_TICKETS = /(bug-[0-9]*|defect-[0-9]*|fix-[0-9]*|bugfix-[0-9]*)/g;
 const TAG_VERSION_NAMING = "v";
 const INITIAL_TAG_VERSION = "0.1.0";
 const VERSION_FOLDER_PATH = "./version_logs";
