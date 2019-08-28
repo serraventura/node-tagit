@@ -1,5 +1,5 @@
 {
-  "name": "y",
+  "name": "node-tagit",
   "version": "0.0.0",
   "description": "Opinionated semver implementation for versioning using git tags with node js",
   "main": "index.js",
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/serraventura/node-tagit.git"
   },
-  "author": "",
+  "author": "Thiago Ventura",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/serraventura/node-tagit/issues"
