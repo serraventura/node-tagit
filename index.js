@@ -124,7 +124,7 @@ module.exports = class NodeTAGit {
 
   pushNewTagVersion(newTag, packagejsonVersion) {
     // const command = 'git tag ' + newTag + ' ' + this.targetBranchName + ';git push --follow-tags';
-    const command = !packagejsonVersion ? `git tag ${newTag} ${this.targetBranchName}` : `npm version ${newTag};git push --follow-tags'`;
+    const command = !packagejsonVersion ? `git tag ${newTag} ${this.targetBranchName}` : `npm version ${newTag} && git push --follow-tags'`;
 
     console.log(command);
 
