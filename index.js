@@ -279,7 +279,7 @@ module.exports = class NodeTAGit {
               if (this.saveHTMLLogs) {
                 this.generateHTMLVersionLog();
               }
-              this.pushNewTagVersion(newTagVersion);
+              this.pushNewTagVersion(newTagVersion, true);
               this.pushNewTagVersion(this.getNewReleaseTagVersion());
             } else {
               console.warn(
@@ -290,9 +290,7 @@ module.exports = class NodeTAGit {
             console.warn("No changes on release. Tag version not applied.");
           }
         } else {
-          this.pushNewTagVersion(
-            `${this.initialTagVersion}`
-          );
+          this.pushNewTagVersion(`${this.initialTagVersion}`, true);
           this.pushNewTagVersion(`${this.tagVersionNaming}${this.initialTagVersion}`);
         }
       } else {
