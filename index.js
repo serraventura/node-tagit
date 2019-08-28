@@ -4,7 +4,7 @@ const fs = require("fs");
 const PROD_BRANCH = "master";
 const REGEX_FEATURE_TICKETS = /(enhancement-[0-9]*|feature-[0-9]*|feat-[0-9]*)/g;
 const REGEX_DEFECT_TICKETS = /(bug-[0-9]*|defect-[0-9]*|fix-[0-9]*|bugfix-[0-9]*)/g;
-const TAG_VERSION_NAMING = "v";
+const TAG_VERSION_NAMING = "release_";
 const INITIAL_TAG_VERSION = "0.1.0";
 const VERSION_FOLDER_PATH = "./version_logs";
 
@@ -48,10 +48,8 @@ module.exports = class NodeTAGit {
     return result;
   }
 
-  getLatestVersionTag(tagName) {
-    const command = `git describe --tags ${
-      this.targetBranchName
-    } --abbrev=0 --match "${tagName || this.tagVersionNaming}*"`;
+  getLatestVersionTag(tagName = 'v') {
+    const command = `git describe --tags ${this.targetBranchName} --abbrev=0 --match "${tagName}*"`;
 
     let result = null;
 
@@ -62,7 +60,7 @@ module.exports = class NodeTAGit {
         .execSync(command)
         .toString()
         .trim();
-    } catch (err) {}
+    } catch (err) { }
 
     console.log("result: ", result);
 
@@ -124,9 +122,9 @@ module.exports = class NodeTAGit {
     return result;
   }
 
-  pushNewTagVersion(newTag) {
+  pushNewTagVersion(newTag, packagejsonVersion) {
     // const command = 'git tag ' + newTag + ' ' + this.targetBranchName + ';git push --follow-tags';
-    const command = `git tag ${newTag} ${this.targetBranchName}`;
+    const command = !packagejsonVersion ? `git tag ${newTag} ${this.targetBranchName}` : `npm version ${newTag};git push --follow-tags'`;
 
     console.log(command);
 
@@ -293,9 +291,9 @@ module.exports = class NodeTAGit {
           }
         } else {
           this.pushNewTagVersion(
-            `${this.tagVersionNaming}${this.initialTagVersion}`
+            `${this.initialTagVersion}`
           );
-          this.pushNewTagVersion(`release_${this.initialTagVersion}`);
+          this.pushNewTagVersion(`${this.tagVersionNaming}${this.initialTagVersion}`);
         }
       } else {
         console.warn(
