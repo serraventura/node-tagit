@@ -303,7 +303,7 @@ module.exports = class NodeTAGit {
 
             if (newTagVersion !== lastTagVersion && log !== "") {
               console.log("newTagVersion: ", newTagVersion);
-              if (this.saveHTMLLogs) {
+              if (this.saveHTMLLogs === 'true') {
                 this.generateHTMLVersionLog();
               }
               this.pushNewTagVersion(newTagVersion, true);
