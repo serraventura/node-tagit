@@ -123,17 +123,31 @@ module.exports = class NodeTAGit {
   }
 
   pushNewTagVersion(newTag, packagejsonVersion) {
-    // const command = 'git tag ' + newTag + ' ' + this.targetBranchName + ';git push --follow-tags';
-    const command = !packagejsonVersion ? `git tag ${newTag} ${this.targetBranchName}` : `npm version ${newTag} && git push --follow-tags'`;
+    let result;
 
-    console.log(command);
+    if (packagejsonVersion) {
+      result = childProcess
+        .execSync(`npm version ${newTag}`)
+        .toString()
+        .trim();
 
-    const result = childProcess
-      .execSync(command)
-      .toString()
-      .trim();
+      console.log("result: ", result);
 
-    console.log("result: ", result, " new version tag pushed");
+      result = childProcess
+        .execSync(`git push --follow-tags`)
+        .toString()
+        .trim();
+
+      console.log("result: ", result);
+    } else {
+      result = childProcess
+        .execSync(`git tag ${newTag} ${this.targetBranchName}`)
+        .toString()
+        .trim();
+    }
+
+    console.log("new version tag pushed");
+    return result;
   }
 
   getCurrentBranch() {
