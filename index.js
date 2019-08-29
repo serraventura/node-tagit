@@ -126,19 +126,23 @@ module.exports = class NodeTAGit {
     let result;
 
     if (packagejsonVersion) {
-      result = childProcess
-        .execSync(`npm version ${newTag}`)
-        .toString()
-        .trim();
+      try {
+        result = childProcess
+          .execSync(`npm version ${newTag}`)
+          .toString()
+          .trim();
 
-      console.log("result: ", result);
+        console.log("result: ", result);
 
-      result = childProcess
-        .execSync(`git push --follow-tags`)
-        .toString()
-        .trim();
+        result = childProcess
+          .execSync(`git push --follow-tags`)
+          .toString()
+          .trim();
 
-      console.log("result: ", result);
+        console.log("result: ", result);
+      } catch (err) {
+        console.log('error bumping npm version.Ì')
+      }
     } else {
       result = childProcess
         .execSync(`git tag ${newTag} ${this.targetBranchName}`)
