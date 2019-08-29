@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/serraventura/node-tagit/issues"
   },
-  "homepage": "https://github.com/serraventura/node-tagit#readme"
+  "homepage": "https://github.com/serraventura/node-tagit#readme",
+  "bin": {
+    "tagit": "./cli.js"
+  }
 }
