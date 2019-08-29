@@ -14,6 +14,8 @@ const [
     tagVersionNaming
 ] = process.argv
 
+console.log(targetBranchName);
+
 new NodeTAGit(
     targetBranchName, 
     initialTagVersion, 
