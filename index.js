@@ -122,23 +122,36 @@ module.exports = class NodeTAGit {
     return result;
   }
 
+  bumpNPMVersion(newTag) {
+    let result;
+
+    result = childProcess
+      .execSync(`npm version ${newTag}`)
+      .toString()
+      .trim();
+
+    console.log("result: ", result);
+
+    result = childProcess
+      .execSync(`git push --follow-tags`)
+      .toString()
+      .trim();
+
+    console.log("result: ", result);
+  }
+
   pushNewTagVersion(newTag, packagejsonVersion) {
     let result;
 
     if (packagejsonVersion) {
-      result = childProcess
-        .execSync(`npm version ${newTag}`)
-        .toString()
-        .trim();
-
-      console.log("result: ", result);
-
-      result = childProcess
-        .execSync(`git push --follow-tags`)
-        .toString()
-        .trim();
-
-      console.log("result: ", result);
+      try {
+        this.bumpNPMVersion(newTag);
+      } catch (err) {
+        childProcess.execSync(`git add .`);
+        childProcess.execSync(`git commit -m "${err.message}"`);
+        this.bumpNPMVersion(newTag);
+        console.log('error bumping npm version.')
+      }
     } else {
       result = childProcess
         .execSync(`git tag ${newTag} ${this.targetBranchName}`)
@@ -176,7 +189,7 @@ module.exports = class NodeTAGit {
   }
 
   getNewReleaseTagVersion() {
-    const lastTagVersion = this.getLatestVersionTag("release_");
+    const lastTagVersion = this.getLatestVersionTag(this.tagVersionNaming);
 
     if (!!lastTagVersion) {
       const versionTag = lastTagVersion.split(".");
@@ -184,7 +197,7 @@ module.exports = class NodeTAGit {
       const MINOR = parseInt(versionTag[1] || 0) + 1;
       return `${MAJOR}.${MINOR}`;
     } else if (!this.log || !lastTagVersion) {
-      return `release_${this.initialTagVersion}`;
+      return `${this.tagVersionNaming}${this.initialTagVersion}`;
     }
   }
 
