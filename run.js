@@ -1,3 +1,3 @@
 const NodeTAGit = require("./index");
 
-new NodeTAGit().run();
+new NodeTAGit('feature/enhancement-2').run();

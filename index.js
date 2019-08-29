@@ -176,7 +176,7 @@ module.exports = class NodeTAGit {
   }
 
   getNewReleaseTagVersion() {
-    const lastTagVersion = this.getLatestVersionTag("release_");
+    const lastTagVersion = this.getLatestVersionTag(this.tagVersionNaming);
 
     if (!!lastTagVersion) {
       const versionTag = lastTagVersion.split(".");
@@ -184,7 +184,7 @@ module.exports = class NodeTAGit {
       const MINOR = parseInt(versionTag[1] || 0) + 1;
       return `${MAJOR}.${MINOR}`;
     } else if (!this.log || !lastTagVersion) {
-      return `release_${this.initialTagVersion}`;
+      return `${this.tagVersionNaming}${this.initialTagVersion}`;
     }
   }
 
