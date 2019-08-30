@@ -1,6 +1,6 @@
 {
   "name": "node-tagit",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Opinionated semver implementation for versioning using git tags with node js",
   "main": "index.js",
   "directories": {
@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/serraventura/node-tagit/issues"
   },
-  "homepage": "https://github.com/serraventura/node-tagit#readme"
+  "homepage": "https://github.com/serraventura/node-tagit#readme",
+  "bin": {
+    "tagit": "./cli.js",
+    "node-tagit": "./cli.js"
+  }
 }

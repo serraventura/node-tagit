@@ -2,8 +2,8 @@ const childProcess = require("child_process");
 const fs = require("fs");
 
 const PROD_BRANCH = "master";
-const REGEX_FEATURE_TICKETS = /(enhancement-[0-9]*|feature-[0-9]*|feat-[0-9]*)/g;
-const REGEX_DEFECT_TICKETS = /(bug-[0-9]*|defect-[0-9]*|fix-[0-9]*|bugfix-[0-9]*)/g;
+const REGEX_FEATURE_TICKETS = "(enhancement #[0-9]*|enhancement#[0-9]*|enhancement/#[0-9]*|enhancement-[0-9]*|feature-[0-9]*|feat-[0-9]*)";
+const REGEX_DEFECT_TICKETS = "(bug #[0-9]*|bug#[0-9]*|bug/#[0-9]*|bug-[0-9]*|defect-[0-9]*|fix-[0-9]*|bugfix-[0-9]*)";
 const TAG_VERSION_NAMING = "release_";
 const INITIAL_TAG_VERSION = "0.1.0";
 const VERSION_FOLDER_PATH = "./version_logs";
@@ -21,12 +21,12 @@ module.exports = class NodeTAGit {
 
   constructor(
     targetBranchName = PROD_BRANCH,
-    tagVersionNaming = TAG_VERSION_NAMING,
     initialTagVersion = INITIAL_TAG_VERSION,
     regexFeatureTickets = REGEX_FEATURE_TICKETS,
     regexDefectTickets = REGEX_DEFECT_TICKETS,
     saveHTMLLogs,
-    versionFolderPath = VERSION_FOLDER_PATH
+    versionFolderPath = VERSION_FOLDER_PATH,
+    tagVersionNaming = TAG_VERSION_NAMING,
   ) {
     this.targetBranchName = targetBranchName;
     this.tagVersionNaming = tagVersionNaming;
@@ -181,7 +181,7 @@ module.exports = class NodeTAGit {
       const logByLine = this.log.split("\n");
 
       logByLine.forEach(item => {
-        if ((item.split(">")[3] || "").match(regex)) isTicketPresent = true;
+        if (new RegExp(regex, "g").test(item.split(">")[3] || "")) isTicketPresent = true;
       });
     }
 
@@ -303,7 +303,7 @@ module.exports = class NodeTAGit {
 
             if (newTagVersion !== lastTagVersion && log !== "") {
               console.log("newTagVersion: ", newTagVersion);
-              if (this.saveHTMLLogs) {
+              if (this.saveHTMLLogs === 'true') {
                 this.generateHTMLVersionLog();
               }
               this.pushNewTagVersion(newTagVersion, true);
