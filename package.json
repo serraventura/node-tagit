@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/serraventura/node-tagit#readme",
   "bin": {
-    "tagit": "./cli.js"
+    "tagit": "./cli.js",
+    "node-tagit": "./cli.js"
   }
 }
